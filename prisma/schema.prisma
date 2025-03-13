@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String      @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String      @unique
+  username     String      @unique
+  password     String
+  phoneNumber  String?     @unique
+  otp          String?
+  isVerified   Boolean     @default(false)
+  role         String      @default("user")
+  profileImage String?     @default("/images/default-avatar.png")
+  location     String?
+  city         String?
+  country      String?
+  addressLine1 String?
+  addressLine2 String?
+  restaurant   Restaurant?
+  orders       Order[]
+  reviews      Review[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Restaurant {
+  id            String     @id @default(uuid())
+  ownerId       String     @unique
+  name          String
+  city          String
+  country       String
+  deliveryPrice Float
+  estimatedTime String
+  cuisines      String
+  imagePath     String?
+  isOpen        Boolean    @default(true)
+  rating        Float?     @default(0.0)
+  reviews       Review[]
+  menu          MenuItem[]
+  orders        Order[]
+  owner         User       @relation(fields: [ownerId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model MenuItem {
+  id           String      @id @default(uuid())
+  restaurantId String
+  name         String
+  description  String?
+  price        Float
+  category     String?
+  options      String?
+  imagePath    String?
+  availability Boolean     @default(true)
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  userId       String
+  restaurantId String
+  totalAmount  Float
+  status       String      @default("pending")
+  items        OrderItem[]
+  user         User        @relation(fields: [userId], references: [id])
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  menuItemId String
+  quantity   Int
+  price      Float
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id])
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  userId       String
+  restaurantId String
+  rating       Float
+  comment      String?
+  user         User       @relation(fields: [userId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime   @default(now())
+}
