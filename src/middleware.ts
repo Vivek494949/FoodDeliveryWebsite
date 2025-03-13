@@ -16,7 +16,13 @@ export async function middleware(request: NextRequest) {
 
 	// console.log("Current Path:", request.nextUrl.pathname);
 	// console.log("Session exists:", !!session);
+	
+	
+	
 	// console.log("Is Public Path:", isPublicPath);
+
+
+
 
 	if (!session && !isPublicPath) {
 		console.log("Middleware (!session and !public path).... redirecting to login page.....");
