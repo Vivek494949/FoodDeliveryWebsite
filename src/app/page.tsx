@@ -22,13 +22,13 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center lg:justify-start">
-                <Link href="/signup">
+                <Link href="/loginSystem/signup">
                   <Button size="lg" className="w-full transition-all duration-300 hover:scale-105 hover:shadow-lg">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/loginSystem/login">
                   <Button size="lg" variant="outline" className="w-full transition-all duration-300 hover:bg-secondary hover:scale-105">
                     Log in
                   </Button>
@@ -188,7 +188,7 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="flex justify-center">
-            <Link href="/signup">
+            <Link href="/loginSystem/signup">
               <Button size="lg" className="transition-all duration-300 hover:scale-105 hover:shadow-lg">
                 Explore All Restaurants
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -263,7 +263,7 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Link href="/signup">
+              <Link href="/loginSystem/signup">
                 <Button size="lg" variant="secondary" className="transition-all duration-300 hover:scale-110 hover:shadow-lg">
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
