@@ -52,7 +52,8 @@ export default function HomePage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement search functionality
-    console.log("Searching for:", searchQuery);
+    // Redirect to search page with the search query
+     router.push(`/search?q=${encodeURIComponent(searchQuery)}&location=London`)
   };
 
   const handleSignOut = async () => {
