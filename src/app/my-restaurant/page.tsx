@@ -11,12 +11,27 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { ShoppingBag, LogOut, Save, Loader2, Upload, Plus, Trash2, LayoutDashboard } from "lucide-react"
+import {
+  ShoppingBag,
+  LogOut,
+  Save,
+  Loader2,
+  Plus,
+  Trash2,
+  LayoutDashboard,
+  CheckCircle,
+  XCircle,
+  Clock,
+  CreditCard,
+  User,
+  MapPin,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 
 // Define the schema for restaurant details
@@ -66,6 +81,31 @@ const availableCuisines = [
   "German",
 ]
 
+// Order interface
+interface Order {
+  id: string
+  status: string
+  totalAmount: number
+  createdAt: string
+  user: {
+    firstName: string
+    lastName: string
+    email: string
+    addressLine1: string | null
+    addressLine2: string | null
+    city: string | null
+    country: string | null
+  }
+  items: {
+    id: string
+    quantity: number
+    price: number
+    menuItem: {
+      name: string
+    }
+  }[]
+}
+
 export default function MyRestaurantPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -76,7 +116,8 @@ export default function MyRestaurantPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
-  const [orders, setOrders] = useState([])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [isUpdatingOrderStatus, setIsUpdatingOrderStatus] = useState<string | null>(null)
 
   // Initialize the form
   const form = useForm<RestaurantFormValues>({
@@ -210,9 +251,7 @@ export default function MyRestaurantPage() {
 
       // Determine if we're creating or updating
       const method = restaurant ? "PATCH" : "POST"
-      const url = restaurant ? `/api/restaurant/owner/${restaurant.id}` : "/api/restaurant"
-      console.log("🚀 Updating restaurant:", restaurant?.id, "URL:", url);
-
+      const url = restaurant ? `/api/restaurant/${restaurant.id}` : "/api/restaurant"
 
       const response = await fetch(url, {
         method,
@@ -236,8 +275,101 @@ export default function MyRestaurantPage() {
     }
   }
 
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    setIsUpdatingOrderStatus(orderId)
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update order status")
+      }
+
+      // Update the order status in the local state
+      setOrders(orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)))
+
+      toast.success("Order status updated successfully")
+    } catch (error) {
+      console.error("Error updating order status:", error)
+      toast.error("Failed to update order status")
+    } finally {
+      setIsUpdatingOrderStatus(null)
+    }
+  }
+
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" })
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date)
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending_payment":
+        return (
+          <span className="flex items-center text-amber-600 bg-amber-100 px-2 py-1 rounded-full text-xs">
+            <CreditCard className="h-3 w-3 mr-1" />
+            Awaiting Payment
+          </span>
+        )
+      case "paid":
+        return (
+          <span className="flex items-center text-blue-600 bg-blue-100 px-2 py-1 rounded-full text-xs">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Paid
+          </span>
+        )
+      case "preparing":
+        return (
+          <span className="flex items-center text-blue-600 bg-blue-100 px-2 py-1 rounded-full text-xs">
+            <Clock className="h-3 w-3 mr-1" />
+            Preparing
+          </span>
+        )
+      case "out_for_delivery":
+        return (
+          <span className="flex items-center text-purple-600 bg-purple-100 px-2 py-1 rounded-full text-xs">
+            <Clock className="h-3 w-3 mr-1" />
+            Out for delivery
+          </span>
+        )
+      case "delivered":
+        return (
+          <span className="flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Delivered
+          </span>
+        )
+      case "cancelled":
+        return (
+          <span className="flex items-center text-red-600 bg-red-100 px-2 py-1 rounded-full text-xs">
+            <XCircle className="h-3 w-3 mr-1" />
+            Cancelled
+          </span>
+        )
+      default:
+        return (
+          <span className="flex items-center text-gray-600 bg-gray-100 px-2 py-1 rounded-full text-xs">
+            <Clock className="h-3 w-3 mr-1" />
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
+        )
+    }
   }
 
   if (status === "loading" || isLoading) {
@@ -260,14 +392,14 @@ export default function MyRestaurantPage() {
               <span className="font-bold text-xl">FoodExpress</span>
             </Link>
           </div>
-  
+
           {/* Right side - Navigation */}
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => router.push("/home")}>
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
             </Button>
-  
+
             <Button variant="ghost" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
@@ -275,16 +407,16 @@ export default function MyRestaurantPage() {
           </div>
         </div>
       </header>
-  
+
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">My Restaurant</h1>
-  
+
         <Tabs defaultValue="manage" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-8">
             <TabsTrigger value="manage">Manage Restaurant</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
-  
+
           <TabsContent value="manage">
             <div className="max-w-4xl mx-auto">
               <Form {...form}>
@@ -292,7 +424,7 @@ export default function MyRestaurantPage() {
                   {/* Section 1: Restaurant Details */}
                   <div className="space-y-6 p-6 border rounded-lg">
                     <h2 className="text-xl font-semibold">Restaurant Details</h2>
-  
+
                     <FormField
                       control={form.control}
                       name="name"
@@ -306,7 +438,7 @@ export default function MyRestaurantPage() {
                         </FormItem>
                       )}
                     />
-  
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
@@ -321,7 +453,7 @@ export default function MyRestaurantPage() {
                           </FormItem>
                         )}
                       />
-  
+
                       <FormField
                         control={form.control}
                         name="country"
@@ -336,14 +468,14 @@ export default function MyRestaurantPage() {
                         )}
                       />
                     </div>
-  
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
                         name="deliveryPrice"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Delivery Price ($)</FormLabel>
+                            <FormLabel>Delivery Price (£)</FormLabel>
                             <FormControl>
                               <Input type="number" step="0.01" min="0" {...field} />
                             </FormControl>
@@ -351,7 +483,7 @@ export default function MyRestaurantPage() {
                           </FormItem>
                         )}
                       />
-  
+
                       <FormField
                         control={form.control}
                         name="estimatedTime"
@@ -367,14 +499,14 @@ export default function MyRestaurantPage() {
                       />
                     </div>
                   </div>
-  
+
                   {/* Section 2: Cuisines Selection */}
                   <div className="space-y-6 p-6 border rounded-lg">
                     <h2 className="text-xl font-semibold">Cuisines</h2>
                     <p className="text-sm text-muted-foreground mb-4">
                       Select the types of cuisines your restaurant offers.
                     </p>
-  
+
                     <FormField
                       control={form.control}
                       name="cuisines"
@@ -395,13 +527,13 @@ export default function MyRestaurantPage() {
                                           onCheckedChange={(checked) => {
                                             return checked
                                               ? field.onChange([...field.value, cuisine])
-                                              : field.onChange(field.value?.filter((value) => value !== cuisine));
+                                              : field.onChange(field.value?.filter((value) => value !== cuisine))
                                           }}
                                         />
                                       </FormControl>
                                       <FormLabel className="font-normal">{cuisine}</FormLabel>
                                     </FormItem>
-                                  );
+                                  )
                                 }}
                               />
                             ))}
@@ -412,8 +544,8 @@ export default function MyRestaurantPage() {
                     />
                   </div>
 
-                    {/* Menu Management */}
-                    <div className="space-y-6 p-6 border rounded-lg">
+                  {/* Menu Management */}
+                  <div className="space-y-6 p-6 border rounded-lg">
                     <h2 className="text-xl font-semibold">Menu Management</h2>
                     <Button type="button" onClick={handleAddMenuItem}>
                       <Plus className="mr-2 h-4 w-4" />
@@ -459,7 +591,7 @@ export default function MyRestaurantPage() {
                   </div>
 
                   {/* Restaurant Profile Image */}
-                    <div className="space-y-6 p-6 border rounded-lg">
+                  <div className="space-y-6 p-6 border rounded-lg">
                     <h2 className="text-xl font-semibold">Restaurant Profile Image</h2>
                     {imagePreview && (
                       <div className="w-full h-48 relative mb-4">
@@ -477,7 +609,7 @@ export default function MyRestaurantPage() {
                       </FormControl>
                     </FormItem>
                   </div>
-  
+
                   {/* Section 3: Save Changes */}
                   <Button type="submit" className="w-full" disabled={isSaving}>
                     {isSaving ? (
@@ -496,18 +628,109 @@ export default function MyRestaurantPage() {
               </Form>
             </div>
           </TabsContent>
-  
+
           <TabsContent value="orders">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-xl font-semibold mb-6">Restaurant Orders</h2>
-  
+
               {orders.length === 0 ? (
                 <div className="text-center py-12 border rounded-lg">
                   <p className="text-muted-foreground">No orders yet</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">Order list would appear here</p>
+                <div className="space-y-6">
+                  {orders.map((order) => (
+                    <div key={order.id} className="border rounded-lg overflow-hidden">
+                      <div className="bg-muted p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
+                            {getStatusBadge(order.status)}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
+                        </div>
+
+                        {/* Status update dropdown */}
+                        {order.status !== "cancelled" && order.status !== "delivered" && (
+                          <div className="flex items-center gap-2">
+                            <Select
+                              defaultValue={order.status}
+                              onValueChange={(value) => handleUpdateOrderStatus(order.id, value)}
+                              disabled={isUpdatingOrderStatus === order.id}
+                            >
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Update status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {order.status === "pending_payment" && (
+                                  <SelectItem value="paid">Mark as Paid</SelectItem>
+                                )}
+                                {(order.status === "pending_payment" || order.status === "paid") && (
+                                  <SelectItem value="preparing">Preparing</SelectItem>
+                                )}
+                                {(order.status === "pending_payment" ||
+                                  order.status === "paid" ||
+                                  order.status === "preparing") && (
+                                  <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
+                                )}
+                                <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                              </SelectContent>
+                            </Select>
+
+                            {isUpdatingOrderStatus === order.id && (
+                              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary"></div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="p-4">
+                        {/* Customer details */}
+                        <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                          <h3 className="font-medium mb-2 flex items-center">
+                            <User className="h-4 w-4 mr-2" />
+                            Customer Details
+                          </h3>
+                          <p className="text-sm">
+                            <span className="font-medium">Name:</span> {order.user.firstName} {order.user.lastName}
+                          </p>
+                          <p className="text-sm">
+                            <span className="font-medium">Email:</span> {order.user.email}
+                          </p>
+                          {order.user.addressLine1 && (
+                            <div className="mt-2 text-sm">
+                              <p className="font-medium flex items-center mb-1">
+                                <MapPin className="h-3 w-3 mr-1" />
+                                Delivery Address:
+                              </p>
+                              <p>{order.user.addressLine1}</p>
+                              {order.user.addressLine2 && <p>{order.user.addressLine2}</p>}
+                              <p>
+                                {order.user.city}, {order.user.country}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Order items */}
+                        <div className="mb-4">
+                          <h3 className="font-medium mb-2">Order Items</h3>
+                          <ul className="list-disc list-inside text-sm space-y-1">
+                            {order.items.map((item) => (
+                              <li key={item.id}>
+                                {item.quantity}x {item.menuItem.name} - £{(item.price * item.quantity).toFixed(2)}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-4 border-t">
+                          <p className="font-bold">Total: £{order.totalAmount.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -515,5 +738,6 @@ export default function MyRestaurantPage() {
         </Tabs>
       </main>
     </div>
-  );
+  )
 }
+

@@ -212,7 +212,8 @@ export default function RestaurantPage() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("/api/orders", {
+      // Create a checkout session with Stripe
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -237,24 +238,20 @@ export default function RestaurantPage() {
         }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        toast({
-          title: "Success",
-          description: "Order placed successfully!",
-        })
-        setCart([])
-        setCheckoutOpen(false)
-        router.push(`/orders/${data.orderId}`)
-      } else {
+      if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || "Failed to place order")
+        throw new Error(error.message || "Failed to create checkout session")
       }
+
+      const { url } = await response.json()
+
+      // Redirect to Stripe Checkout
+      window.location.href = url
     } catch (error) {
       console.error("Checkout error:", error)
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to place order",
+        description: error instanceof Error ? error.message : "Failed to process checkout",
         variant: "destructive",
       })
     } finally {

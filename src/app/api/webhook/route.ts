@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client"
 import Stripe from "stripe"
 
 const prisma = new PrismaClient()
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const stripe = new Stripe(process.env.STRIPE_API_KEY!)
 
 // This is your Stripe webhook secret for testing your endpoint locally.
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET

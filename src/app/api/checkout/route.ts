@@ -5,10 +5,19 @@ import { PrismaClient } from "@prisma/client"
 import Stripe from "stripe"
 
 const prisma = new PrismaClient()
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
+  apiVersion: "2025-03-31.basil",
+})
+
+console.log("🚨 File /api/checkout/route.ts is being loaded")
+
 
 export async function POST(request: NextRequest) {
+  console.log("Checkout below this now:")
   try {
+    console.log("Checkout below this :")
+    console.log("STRIPE_SECRET_KEY:", process.env.STRIPE_API_KEY)
+
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
