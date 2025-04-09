@@ -7,22 +7,28 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-export async function uploadImage(file: Buffer): Promise<string> {
-  try {
-    // Convert the buffer to a base64 string
-    const base64Data = `data:image/jpeg;base64,${file.toString("base64")}`
-
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(base64Data, {
-      folder: "food-delivery",
-      resource_type: "image",
-    })
-
-    // Return the secure URL
-    return result.secure_url
-  } catch (error) {
-    console.error("Error uploading image to Cloudinary:", error)
-    throw new Error("Failed to upload image")
-  }
+/**
+ * Uploads an image to Cloudinary
+ * @param file The file buffer to upload
+ * @param folder The folder to upload to (optional)
+ * @returns The Cloudinary upload response
+ */
+export async function uploadImage(file: Buffer, folder = "food-express") {
+  return new Promise<{ secure_url: string }>((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder,
+          resource_type: "image",
+          transformation: [{ width: 800, height: 600, crop: "limit" }, { quality: "auto" }, { fetch_format: "auto" }],
+        },
+        (error, result) => {
+          if (error || !result) {
+            return reject(error || new Error("Failed to upload image"))
+          }
+          resolve({ secure_url: result.secure_url })
+        },
+      )
+      .end(file)
+  })
 }
-

@@ -112,6 +112,7 @@ export default function MyRestaurantPage() {
   const [activeTab, setActiveTab] = useState("manage")
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [restaurant, setRestaurant] = useState<any>(null)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -217,11 +218,44 @@ export default function MyRestaurantPage() {
     setMenuItems(updatedItems)
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setImageFile(file)
+
+      // Create a local preview
       setImagePreview(URL.createObjectURL(file))
+
+      //Upload to Cloudinary immediately if desired
+      await uploadImageToCloudinary(file)
+    }
+  }
+
+  const uploadImageToCloudinary = async (file: File) => {
+    setIsUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append("image", file)
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image")
+      }
+
+      const data = await response.json()
+      setImagePreview(data.url)
+      toast.success("Image uploaded successfully")
+      return data.url
+    } catch (error) {
+      console.error("Error uploading image:", error)
+      toast.error("Failed to upload image")
+      return null
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -251,7 +285,7 @@ export default function MyRestaurantPage() {
 
       // Determine if we're creating or updating
       const method = restaurant ? "PATCH" : "POST"
-      const url = restaurant ? `/api/restaurant/${restaurant.id}` : "/api/restaurant"
+      const url = restaurant ? `/api/restaurant/owner/${restaurant.id}` : "/api/restaurant"
 
       const response = await fetch(url, {
         method,

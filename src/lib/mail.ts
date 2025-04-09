@@ -19,7 +19,7 @@ export async function sendEmail(to: string, otp: string) {
 
   try {
     const info = await transporter.sendMail({
-      from: `"Donor and Seeker" <${process.env.EMAIL_USER}>`,
+      from: `"Food Express" <${process.env.EMAIL_USER}>`,
       to,
       subject: "Your OTP Code",
       text: `Your OTP code is: ${otp}`,
