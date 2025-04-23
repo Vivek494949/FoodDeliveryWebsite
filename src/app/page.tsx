@@ -208,7 +208,7 @@ export default function LandingPage() {
               </div>
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">What Our Customers Say</h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Don't just take our word for it. Here's what our satisfied customers have to say.
+                Don&apos;t just take our word for it. Here&apos;s what our satisfied customers have to say.
               </p>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function LandingPage() {
                 className="flex flex-col justify-between space-y-4 rounded-lg border p-6 bg-background transition-all duration-300 hover:shadow-lg hover:border-primary hover:scale-105"
                 style={{ animationDelay: `${i * 150}ms` }}
               >
-                <p className="text-muted-foreground italic">"{testimonial.text}"</p>
+                <p className="text-muted-foreground italic">&apos;{testimonial.text}&apos;</p>
                 <div className="flex items-center space-x-4">
                   <div className="rounded-full bg-muted h-12 w-12 overflow-hidden transition-transform duration-300 hover:scale-110">
                     <img 
