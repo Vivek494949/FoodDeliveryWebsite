@@ -116,10 +116,10 @@ export default function SignupPage() {
                 <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Verification Email Sent!</h3>
                 <p className="text-gray-600 mb-4">
-                  We've sent a verification link to your email address. Please check your inbox and follow the
+                  We&apos;ve sent a verification link to your email address. Please check your inbox and follow the
                   instructions to verify your account.
                 </p>
-                <p className="text-sm text-gray-500">You'll be redirected to the login page in a moment...</p>
+                <p className="text-sm text-gray-500">You&apos;ll be redirected to the login page in a moment...</p>
               </div>
             ) : (
               <Form {...form}>

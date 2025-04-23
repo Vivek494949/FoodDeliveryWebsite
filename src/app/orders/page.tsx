@@ -169,7 +169,7 @@ export default function OrdersPage() {
             <div className="text-center py-12 border rounded-lg">
               <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
-              <p className="text-muted-foreground mb-6">You haven't placed any orders yet.</p>
+              <p className="text-muted-foreground mb-6">{"You haven't placed any orders yet."}</p>
               <Button onClick={() => router.push("/home")}>Browse Restaurants</Button>
             </div>
           ) : (

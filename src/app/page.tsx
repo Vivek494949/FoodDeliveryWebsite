@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Utensils, Clock, MapPin, Star, ShoppingBag } from 'lucide-react';
+import { ArrowRight, Utensils, Clock, MapPin, Star, ShoppingBag } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 // import LandingNavbar from "@/components/landing-navbar";
 

@@ -80,7 +80,7 @@ export default function LoginPage() {
           <div>
             <h2 className="text-3xl font-bold">Welcome back</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/loginSystem/signup" className="text-primary hover:underline">
                 Sign up
               </Link>
@@ -142,7 +142,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-primary to-primary-foreground">
           <div className="flex h-full items-center justify-center p-12 text-white">
             <div className="max-w-lg">
-              <h2 className="text-3xl font-bold mb-4">Hungry? We've got you covered.</h2>
+              <h2 className="text-3xl font-bold mb-4">Hungry? We&apos;ve got you covered.</h2>
               <p className="text-lg mb-6">
                 Log in to your account to order from your favorite restaurants and enjoy fast, reliable delivery.
               </p>

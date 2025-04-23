@@ -39,7 +39,7 @@ export default function VerifyOtpPage() {
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-bold text-center mb-4">Verify OTP</h2>
         <p className="text-sm text-gray-600 text-center mb-6">
-          We've sent an OTP to <strong>{email}</strong>. Enter it below.
+          We&apos;ve sent an OTP to <strong>{email}</strong>. Enter it below.
         </p>
         <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" className="mb-4" />
         <Button onClick={verifyOtp} className="w-full" disabled={isLoading}>
