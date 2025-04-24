@@ -12,8 +12,9 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    const params = await context.params;
-    const {id:orderId} = params
+    // const params = await context.params;
+    // const {id:orderId} = params
+    const { id: orderId } = await context.params
 
     // Fetch the order with related data
     const order = await prisma.order.findUnique({

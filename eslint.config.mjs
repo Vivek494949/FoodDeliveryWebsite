@@ -11,6 +11,12 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    rules: {
+      "no-await-in-loop": "off", // Example of disabling a rule
+      // Add other rules to disable as needed
+    },
+  },
 ];
 
 export default eslintConfig;
