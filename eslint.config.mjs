@@ -15,6 +15,7 @@ const eslintConfig = [
     rules: {
       "no-await-in-loop": "off", // Example of disabling a rule
       // Add other rules to disable as needed
+      "@next/next/no-img-element": "off"
     },
   },
 ];

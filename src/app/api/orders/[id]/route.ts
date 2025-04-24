@@ -5,18 +5,19 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+// ✅ FIX HERE
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    // const params = await context.params;
-    // const {id:orderId} = params
-    const { id: orderId } = await context.params
+    const orderId = params.id
 
-    // Fetch the order with related data
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
         },
         user: {
           select: {
-            id :true,
+            id: true,
             firstName: true,
             lastName: true,
             email: true,
@@ -56,8 +57,6 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       return NextResponse.json({ message: "Order not found" }, { status: 404 })
     }
 
-    // Check if the user is authorized to view this order
-    // Users can only view their own orders
     if (order.user.id !== session.user.id) {
       return NextResponse.json({ message: "You are not authorized to view this order" }, { status: 403 })
     }
@@ -70,4 +69,3 @@ export async function GET(request: NextRequest, context: { params: { id: string 
     await prisma.$disconnect()
   }
 }
-
