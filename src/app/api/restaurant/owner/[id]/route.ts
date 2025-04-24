@@ -4,6 +4,13 @@ import { authOptions } from "@/lib/auth" // Import NextAuth config
 import prisma from "@/lib/prisma" // Import Prisma client
 import { uploadImage } from "@/lib/cloudinary"
 
+type MenuItemInput = {
+  id?: string
+  name: string
+  price: number
+  description?: string
+}
+
 export async function GET(request: Request, context: { params: { id: string } }) {
   try {
     // Await context.params
@@ -84,12 +91,12 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     const cuisines = cuisinesRaw ? cuisinesRaw.split(",").map((c) => c.trim()) : []
 
     const menuRaw = formData.get("menu")?.toString()
-    let menuItems: {
-      id: any ;name: string; price: number; description?: string 
-}[] = []
+    let menuItems: MenuItemInput[] = []
+
     try {
       menuItems = menuRaw ? JSON.parse(menuRaw) : []
     } catch (err) {
+      console.error("❌ Invalid menu JSON:", err)
       return NextResponse.json({ message: "Invalid menu format" }, { status: 400 })
     }
 
@@ -112,7 +119,7 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     }
 
     // 🛠 First, update the restaurant details without touching the menu
-    const updatedRestaurant = await prisma.restaurant.update({
+     await prisma.restaurant.update({
       where: { id: restaurantId },
       data: {
         name,

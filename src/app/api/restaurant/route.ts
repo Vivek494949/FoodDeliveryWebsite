@@ -6,6 +6,12 @@ import { uploadImage } from "@/lib/cloudinary"
 
 const prisma = new PrismaClient()
 
+type NewMenuItem = {
+  name: string
+  price: number
+  description?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -44,7 +50,8 @@ export async function POST(request: NextRequest) {
     let imagePath = null
     if (image) {
       const buffer = Buffer.from(await image.arrayBuffer())
-      imagePath = await uploadImage(buffer)
+      imagePath = (await uploadImage(buffer)).secure_url
+
     }
 
     // Create restaurant
@@ -59,10 +66,10 @@ export async function POST(request: NextRequest) {
         cuisines,
         imagePath,
         menu: {
-          create: menuItems.map((item: any) => ({
+          create: (menuItems as NewMenuItem[]).map((item) => ({
             name: item.name,
             description: item.description || null,
-            price: Number.parseFloat(item.price),
+            price: Number.parseFloat(item.price.toString()),
             category: "Main",
           })),
         },

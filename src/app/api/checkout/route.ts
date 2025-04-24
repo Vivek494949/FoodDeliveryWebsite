@@ -11,6 +11,10 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
 
 console.log("🚨 File /api/checkout/route.ts is being loaded")
 
+type OrderItemInput = {
+  menuItemId: string
+  quantity: number
+}
 
 export async function POST(request: NextRequest) {
   console.log("Checkout below this now:")
@@ -25,7 +29,18 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id
     const body = await request.json()
-    const { restaurantId, items, deliveryDetails, totalAmount } = body
+    const { restaurantId, items, deliveryDetails, totalAmount }: {
+      restaurantId: string
+      items: OrderItemInput[]
+      deliveryDetails: {
+        addressLine1: string
+        addressLine2?: string
+        city?: string
+        country?: string
+      }
+      totalAmount: number
+    } = body
+    
 
     // Validate required fields
     if (!restaurantId || !items || !Array.isArray(items) || items.length === 0) {
@@ -50,7 +65,7 @@ export async function POST(request: NextRequest) {
         status: "pending_payment",
         items: {
           create: await Promise.all(
-            items.map(async (item: any) => {
+            items.map(async (item: OrderItemInput) => {
               // Fetch the actual menu item from the database to verify the price
               const menuItem = await prisma.menuItem.findUnique({
                 where: { id: item.menuItemId },

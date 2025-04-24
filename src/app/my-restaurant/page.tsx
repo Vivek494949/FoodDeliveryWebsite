@@ -105,6 +105,18 @@ interface Order {
   }[]
 }
 
+interface Restaurant {
+  id: string
+  name: string
+  city: string
+  country: string
+  deliveryPrice: number
+  estimatedTime: string
+  cuisines: string
+  imagePath?: string
+  menu: MenuItem[]
+}
+
 export default function MyRestaurantPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -112,7 +124,7 @@ export default function MyRestaurantPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-  const [restaurant, setRestaurant] = useState<any>(null)
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -639,6 +651,10 @@ export default function MyRestaurantPage() {
                       <FormLabel>Upload Image</FormLabel>
                       <FormControl>
                         <Input type="file" accept="image/*" onChange={handleImageChange} />
+                        {isUploading && (
+                            <div className="text-sm text-muted-foreground mt-2">Uploading image...</div>
+                        )}
+
                       </FormControl>
                     </FormItem>
                   </div>

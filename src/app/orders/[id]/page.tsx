@@ -14,7 +14,7 @@ interface Order {
   totalAmount: number
   createdAt: string
   restaurant: {
-    id: any
+    id: string
     name: string
     imagePath: string | null
   }
