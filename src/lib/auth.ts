@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
         }
       
         // Remove password before returning user object
-        const { password, ...userWithoutPassword } = user;
+        const { password: _password, ...userWithoutPassword } = user;
       
         return {
           ...userWithoutPassword,
