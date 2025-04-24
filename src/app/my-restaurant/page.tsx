@@ -651,11 +651,10 @@ export default function MyRestaurantPage() {
                       <FormLabel>Upload Image</FormLabel>
                       <FormControl>
                         <Input type="file" accept="image/*" onChange={handleImageChange} />
-                        {isUploading && (
-                            <div className="text-sm text-muted-foreground mt-2">Uploading image...</div>
-                        )}
-
                       </FormControl>
+                      {isUploading && (
+                            <div className="text-sm text-muted-foreground mt-2">Uploading image...</div>
+                      )}
                     </FormItem>
                   </div>
 

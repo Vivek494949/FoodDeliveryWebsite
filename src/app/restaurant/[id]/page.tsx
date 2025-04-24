@@ -604,6 +604,11 @@ export default function RestaurantPage() {
           {/* Order Summary */}
           <div className="w-full lg:w-1/3">
             <div className="sticky top-20 bg-card rounded-lg border p-6">
+            {userProfile && (
+              <div className="text-sm text-muted-foreground mb-4">
+                  Delivering to: {userProfile.addressLine1}, {userProfile.city}, {userProfile.country}
+              </div>
+            )}
               <h2 className="text-2xl font-bold mb-4">Your Order</h2>
 
               {cart.length === 0 ? (
