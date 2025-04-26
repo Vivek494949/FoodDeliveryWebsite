@@ -3,9 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Make sure this is defined in your .env file
 }
+
 
 model User {
   id           String      @id @default(uuid())

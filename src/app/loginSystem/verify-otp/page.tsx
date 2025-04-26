@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
-export default function VerifyOtpPage() {
+// This component uses useSearchParams and will be wrapped in Suspense
+function OtpVerificationForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get("email") || ""
@@ -35,17 +37,32 @@ export default function VerifyOtpPage() {
   }
 
   return (
+    <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-bold text-center mb-4">Verify OTP</h2>
+      <p className="text-sm text-gray-600 text-center mb-6">
+        We&apos;ve sent an OTP to <strong>{email}</strong>. Enter it below.
+      </p>
+      <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" className="mb-4" />
+      <Button onClick={verifyOtp} className="w-full" disabled={isLoading}>
+        {isLoading ? "Verifying..." : "Verify & Login"}
+      </Button>
+    </div>
+  )
+}
+
+// Main component that doesn't directly use useSearchParams
+export default function VerifyOtpPage() {
+  return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
-        <h2 className="text-2xl font-bold text-center mb-4">Verify OTP</h2>
-        <p className="text-sm text-gray-600 text-center mb-6">
-          We&apos;ve sent an OTP to <strong>{email}</strong>. Enter it below.
-        </p>
-        <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" className="mb-4" />
-        <Button onClick={verifyOtp} className="w-full" disabled={isLoading}>
-          {isLoading ? "Verifying..." : "Verify & Login"}
-        </Button>
-      </div>
+      <Suspense
+        fallback={
+          <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        }
+      >
+        <OtpVerificationForm />
+      </Suspense>
     </div>
   )
 }

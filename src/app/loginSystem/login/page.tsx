@@ -1,37 +1,31 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { signIn } from "next-auth/react";
-import { ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { toast } from "sonner";
+import { useState, Suspense } from "react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { signIn } from "next-auth/react"
+import { ShoppingBag, ArrowRight, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { toast } from "sonner"
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
-});
+})
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/home";
-  const [isLoading, setIsLoading] = useState(false);
+// This component uses useSearchParams and will be wrapped in Suspense
+function LoginForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/home"
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -39,34 +33,87 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
-  });
+  })
 
   async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
         redirect: false, // Prevents automatic redirection
-      });
-  
+      })
+
       if (result?.error) {
-        toast.error("Invalid email or password. Please try again.");
-        return; // Exit early to prevent further execution
+        toast.error("Invalid email or password. Please try again.")
+        return // Exit early to prevent further execution
       }
-  
-      toast.success("You have successfully logged in.");
-      router.push(callbackUrl);
-      router.refresh();
+
+      toast.success("You have successfully logged in.")
+      router.push(callbackUrl)
+      router.refresh()
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Something went wrong. Please try again.");
+      console.error("Login error:", error)
+      toast.error("Something went wrong. Please try again.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
-  
 
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="john.doe@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center justify-between">
+                <FormLabel>Password</FormLabel>
+                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            <>
+              Sign in
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </form>
+    </Form>
+  )
+}
+
+// Main component that doesn't directly use useSearchParams
+export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-col justify-center w-full px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 lg:w-1/2">
@@ -87,54 +134,15 @@ export default function LoginPage() {
             </p>
           </div>
           <div className="mt-8">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="john.doe@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between">
-                        <FormLabel>Password</FormLabel>
-                        <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                          Forgot password?
-                        </Link>
-                      </div>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Logging in...
-                    </>
-                  ) : (
-                    <>
-                      Sign in
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              }
+            >
+              <LoginForm />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -169,5 +177,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

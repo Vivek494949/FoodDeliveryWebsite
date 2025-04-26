@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/restaurant/[id]/orders/route.js", "src/app/api/restaurant/owner/[id]/route.js", "src/app/api/restaurants/[id]/reviews/route.js", "src/app/api/restaurants/[id]/route.js"],
   "exclude": ["node_modules"]
 }
