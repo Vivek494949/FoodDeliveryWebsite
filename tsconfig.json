@@ -1,8 +1,15 @@
 {
   "compilerOptions": {
-    "typeRoots": ["./types", "./node_modules/@types"],
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types"
+    ],
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,9 +27,22 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/restaurant/[id]/orders/route.js", "src/app/api/restaurant/owner/[id]/route.js", "src/app/api/restaurants/[id]/reviews/route.js", "src/app/api/restaurants/[id]/route.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/app/api/MyRestaurant/MyOrders/[id]/route.js",
+    "src/app/api/MyRestaurant/manageRestaurant/[id]/route.js",
+    "src/app/api/user/restaurants/[id]/reviews/route.js",
+    "src/app/api/user/restaurants/[id]/route.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

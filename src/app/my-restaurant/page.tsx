@@ -152,7 +152,7 @@ export default function MyRestaurantPage() {
     const fetchRestaurantData = async () => {
       if (session?.user?.id) {
         try {
-          const response = await fetch(`/api/restaurant/owner/${session.user.id}`)
+          const response = await fetch(`/api/MyRestaurant/manageRestaurant/${session.user.id}`)
 
           if (response.ok) {
             const data = await response.json()
@@ -193,7 +193,7 @@ export default function MyRestaurantPage() {
     const fetchOrders = async () => {
       if (restaurant?.id) {
         try {
-          const response = await fetch(`/api/restaurant/${restaurant.id}/orders`)
+          const response = await fetch(`/api/MyRestaurant/MyOrders/${restaurant.id}`)
           if (response.ok) {
             const data = await response.json()
             setOrders(data)
@@ -296,7 +296,7 @@ export default function MyRestaurantPage() {
 
       // Determine if we're creating or updating
       const method = restaurant ? "PATCH" : "POST"
-      const url = restaurant ? `/api/restaurant/owner/${restaurant.id}` : "/api/restaurant"
+      const url = restaurant ? `/api/MyRestaurant/manageRestaurant/${restaurant.id}` : "/api/MyRestaurant"
 
       const response = await fetch(url, {
         method,
@@ -324,7 +324,7 @@ export default function MyRestaurantPage() {
     setIsUpdatingOrderStatus(orderId)
 
     try {
-      const response = await fetch(`/api/orders/${orderId}/status`, {
+      const response = await fetch(`/api/user/Myorders/${orderId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

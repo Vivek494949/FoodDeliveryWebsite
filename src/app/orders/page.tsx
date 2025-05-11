@@ -42,7 +42,7 @@ export default function OrdersPage() {
       if (session?.user?.id) {
         setIsLoading(true)
         try {
-          const response = await fetch("/api/orders/user")
+          const response = await fetch("/api/user/Myorders")
           if (response.ok) {
             const data = await response.json()
             setOrders(data)

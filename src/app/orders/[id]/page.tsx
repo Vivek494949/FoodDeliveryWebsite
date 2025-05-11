@@ -57,7 +57,7 @@ export default function OrderDetailPage() {
 
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/orders/${id}`)
+        const response = await fetch(`/api/user/Myorders/${id}`)
 
         if (!response.ok) {
           if (response.status === 404) {

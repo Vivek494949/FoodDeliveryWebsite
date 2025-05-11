@@ -106,7 +106,7 @@ export default function RestaurantPage() {
     const fetchRestaurant = async () => {
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/restaurants/${id}`)
+        const response = await fetch(`/api/user/restaurants/${id}`)
         if (response.ok) {
           const data = await response.json()
           setRestaurant(data)
@@ -272,7 +272,7 @@ export default function RestaurantPage() {
     setIsSubmittingReview(true)
 
     try {
-      const response = await fetch(`/api/restaurants/${id}/reviews`, {
+      const response = await fetch(`/api/user/restaurants/${id}/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

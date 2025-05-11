@@ -64,7 +64,7 @@ export default function HomePage() {
     const fetchRestaurants = async () => {
       setIsLoadingRestaurants(true)
       try {
-        const response = await fetch("/api/restaurants?limit=6")
+        const response = await fetch("/api/user/restaurants?limit=6")
         if (response.ok) {
           const data = await response.json()
           setRestaurants(data.restaurants)

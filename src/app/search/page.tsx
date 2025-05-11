@@ -74,7 +74,7 @@ export default function SearchPage() {
     const fetchRestaurants = async () => {
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/restaurants/search?q=${query}&location=${location}`)
+        const response = await fetch(`/api/user/search?q=${query}&location=${location}`)
         if (response.ok) {
             const data: Restaurant[] = await response.json()
 
