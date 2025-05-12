@@ -39,7 +39,7 @@ export default function LandingPage() {
               <img
                 alt="Food Delivery"
                 className="aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last shadow-lg transition-all duration-500 hover:shadow-xl hover:scale-[1.02]"
-                src="/placeholder.svg?height=550&width=750"
+                src="https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=750&q=80"
               />
             </div>
           </div>

@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     if (query) {
       searchConditions.push({
         OR: [
-          { name: { contains: query } },
-          { cuisines: { contains: query } },
+          { name: { contains: query , mode: "insensitive" as const} },
+          { cuisines: { contains: query , mode: "insensitive" as const} },
         ],
       })
     }
@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     if (location) {
       searchConditions.push({
         OR: [
-          { city: { contains: location } },
-          { country: { contains: location } },
+          { city: { contains: location , mode: "insensitive" as const} },
+          { country: { contains: location , mode: "insensitive" as const} },
         ],
       })
     }
