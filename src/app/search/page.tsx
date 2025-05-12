@@ -63,8 +63,31 @@ export default function SearchPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [availableCities, setAvailableCities] = useState<string[]>([])
+
 
   const resultsPerPage = 10
+  
+  useEffect(() => {
+  const fetchCities = async () => {
+    try {
+      const response = await fetch("/api/user/search/fetchcities")
+      const data = await response.json()
+      setAvailableCities(data)
+
+      // If no location is selected, default to first city
+      if (!searchLocation && data.length > 0) {
+        setSearchLocation(data[0])
+      }
+    } catch (error) {
+      console.error("Error fetching cities:", error)
+    }
+  }
+
+  if (status === "authenticated") {
+    fetchCities()
+  }
+}, [status])
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -190,13 +213,23 @@ export default function SearchPage() {
             </div>
             <div className="relative w-1/3">
               <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Location"
-                className="w-full rounded-lg border border-input bg-background px-10 py-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                value={searchLocation}
-                onChange={(e) => setSearchLocation(e.target.value)}
-              />
+              <Select value={searchLocation} onValueChange={setSearchLocation}>
+  <SelectTrigger className="w-full border border-input bg-background px-10 py-3 h-[46px] text-sm">
+    <SelectValue placeholder="Select a city" />
+  </SelectTrigger>
+  <SelectContent>
+    {isLoading ? (
+      <SelectItem value="loading">Loading cities...</SelectItem>
+    ) : (
+      availableCities.map((city) => (
+        <SelectItem key={city} value={city}>
+          {city}
+        </SelectItem>
+      ))
+    )}
+  </SelectContent>
+</Select>
+
             </div>
             <Button type="submit" className="bg-orange-500 hover:bg-orange-600">
               Search
